@@ -24,9 +24,9 @@ class ExpRecognition():
             id = int(str_id)
             if id >= 0:
                 self.gpu_ids.append(id)
-        if len(self.gpu_ids) > 0:
-            torch.cuda.set_device(self.gpu_ids[0])
-        self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')
+        # if len(self.gpu_ids) > 0:
+        #     torch.cuda.set_device(0)
+        self.device = torch.device('cpu')
         self.landmark_num = landmark_num
         self.image_width = image_width
 
@@ -55,13 +55,13 @@ class ExpRecognition():
         # self.model = VGG('VGG19', landmark_num=self.landmark_num) # use VGG model
         self.model = ResNet18(landmark_num=self.landmark_num) # use ResNet18 model
         if model_path is not None:
-            assert(torch.cuda.is_available())
+            # assert(torch.cuda.is_available())
             self.model.to(self.device)
             self.model = nn.DataParallel(self.model, self.gpu_ids)
-            ck = torch.load(model_path)
+            ck = torch.load(model_path,map_location='cpu')
             self.model.load_state_dict(ck['net'])
         if len(self.gpu_ids) > 0:
-            assert(torch.cuda.is_available())
+            # assert(torch.cuda.is_available())
             self.model.to(self.device)
             self.model = nn.DataParallel(self.model, self.gpu_ids)
         # optimizer
@@ -209,3 +209,4 @@ class ExpRecognition():
     def set_lr(self, optimizer, lr):
         for group in optimizer.param_groups:
             group['lr'] = lr
+
