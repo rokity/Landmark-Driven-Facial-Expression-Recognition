@@ -10,3 +10,5 @@ if __name__ == '__main__':
     model.load_test_data(opt.test_image_path, opt.num_workers)
     model.prepare_tool(model_path = opt.model_path)
     model.test(opt.test_path, 0)
+
+
